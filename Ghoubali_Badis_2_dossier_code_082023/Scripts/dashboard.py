@@ -86,6 +86,12 @@ def plot_distribution(selected_feature, col):
                 )
             )
 
+            # Utiliser une échelle logarithmique si la distribution est fortement asymétrique :
+            mean_val = np.mean(hist_data)
+            std_val = np.std(hist_data)
+            if std_val > 3 * mean_val:  # Ce seuil peut être ajusté selon vos besoins
+                fig.update_layout(yaxis_type="log")
+
         fig.update_layout(
             title_text=f"Distribution pour {selected_feature}",
             xaxis_title=selected_feature,
