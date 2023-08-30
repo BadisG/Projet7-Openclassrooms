@@ -47,21 +47,31 @@ def plot_distribution(selected_feature, col):
         fig = go.Figure()
 
         # Vérifier si la fonctionnalité est catégorielle :
-        unique_values = data.dropna().unique()
-        if set(unique_values) == {0, 1}:
-            # Compter les occurrences de 0 et 1 :
-            counts = data.value_counts()
+        unique_values = sorted(data.dropna().unique())
+        if set(unique_values) <= {0, 1, 2, 3, 4, 5, 6, 7}:
+            # Compter les occurrences de chaque valeur :
+            counts = data.value_counts().sort_index()
 
-            # Trouvez la valeur pour le client :
-            client_value = 1 if client_feature_value == 1 else 0
+            # Assurez-vous que les longueurs correspondent
+            assert len(unique_values) == len(counts)
 
-            # Couleurs pour les barres :
-            colors = ["blue", "blue"]
-            if client_value in counts.index:
+            # Modifier la déclaration de la liste de couleurs pour correspondre à la taille de unique_values
+            colors = ["blue"] * len(unique_values)
+
+            # Mettre à jour client_value
+            client_value = (
+                unique_values.index(client_feature_value)
+                if client_feature_value in unique_values
+                else None
+            )
+
+            # Mettre à jour la couleur correspondante si client_value n'est pas None
+            if client_value is not None:
                 colors[client_value] = "red"
 
-            # Tracer la distribution pour les variables catégorielles :
-            fig.add_trace(go.Bar(x=[0, 1], y=counts.values, marker_color=colors))
+            # Modifier le tracé pour utiliser unique_values
+            fig.add_trace(go.Bar(x=unique_values, y=counts.values, marker_color=colors))
+
         else:
             # Calculer les bins pour le histogramme :
             hist_data, bins = np.histogram(data.dropna(), bins=20)
