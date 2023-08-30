@@ -1,7 +1,10 @@
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import requests
 import streamlit as st
+
+df_test = pd.read_csv("./Ghoubali_Badis_2_dossier_code_082023/Simulations/df_test.csv")
 
 st.set_page_config(layout='wide') 
 
@@ -21,18 +24,77 @@ def format_value(val):
         return round(val, 2)
     return val
 
+# Fonction pour afficher le tracé de distribution :
+import numpy as np
+import plotly.graph_objects as go
+
+
+def plot_distribution(selected_feature, col):
+    if selected_feature:
+        data = df_test[selected_feature]
+        
+        # Trouver la valeur de la fonctionnalité pour le client actuel :
+        client_feature_value = feature_values[feature_names.index(selected_feature)]
+        
+        # Calculer les bins pour le histogramme :
+        hist_data, bins = np.histogram(data.dropna(), bins=20)  # On utilise dropna uniquement pour le calcul des bins
+        
+        # Trouvez le bin pour client_feature_value :
+        client_bin_index = np.digitize(client_feature_value, bins) - 1  # '-1' car np.digitize renvoie l'index du bin suivant
+        
+        # Créer une liste de couleurs pour les bins :
+        colors = ['blue'] * len(hist_data)
+        if 0 <= client_bin_index < len(hist_data):  # Vérifiez que l'index est valide
+            colors[client_bin_index] = 'red'
+
+        fig = go.Figure()
+
+        # Tracer la distribution avec les couleurs personnalisées :
+        fig.add_trace(go.Histogram(x=data, marker=dict(color=colors, opacity=0.7), name="Distribution", xbins=dict(start=bins[0], end=bins[-1], size=bins[1]-bins[0])))
+        
+        fig.update_layout(title_text=f"Distribution pour {selected_feature}", xaxis_title=selected_feature, yaxis_title="Nombre de clients")
+        
+        col.plotly_chart(fig)
+
+
+# Une fonction pour récupérer les états stockés :
+def get_state():
+    if 'state' not in st.session_state:
+        st.session_state['state'] = {
+            'data_received': False,
+            'data': None,
+            'last_sk_id_curr': None  # Ajoutez cette ligne pour stocker le dernier ID soumis
+        }
+    elif 'last_sk_id_curr' not in st.session_state['state']:  # Vérifiez si 'last_sk_id_curr' existe
+        st.session_state['state']['last_sk_id_curr'] = None  # Si ce n'est pas le cas, ajoutez-le.
+        
+    return st.session_state['state']
+
+
+state = get_state()
+
 
 st.markdown("<h1 style='text-align: center; color: black;'>Estimation du risque de non-remboursement</h1>", unsafe_allow_html=True)
-sk_id_curr = st.text_input("Entrez le SK_ID_CURR:")
+sk_id_curr = st.text_input("Entrez le SK_ID_CURR: (373022 = Refusé | 156925 = Accepté)")
 col1, col2 = st.columns([1, 20])
 
-if col1.button('Run'):
-    response = requests.post("http://localhost:5000/predict", json={'SK_ID_CURR': int(sk_id_curr)})
-    if response.status_code != 200:
-        st.error(f"Erreur lors de l'appel à l'API: {response.status_code}")
-        st.stop()
+if col1.button('Run') or state['data_received']:
+   # Avant de traiter l'appel API, vérifiez si l'ID actuel est différent du dernier ID
+    if state['last_sk_id_curr'] != sk_id_curr:
+        state['data_received'] = False
+        state['last_sk_id_curr'] = sk_id_curr  # Mettez à jour le dernier ID
+
+    if not state['data_received']:
+        response = requests.post("http://localhost:5000/predict", json={'SK_ID_CURR': int(sk_id_curr)})
+        if response.status_code != 200:
+            st.error(f"Erreur lors de l'appel à l'API: {response.status_code}")
+            st.stop()
+        
+        state['data'] = response.json()
+        state['data_received'] = True
     
-    data = response.json()
+    data = state['data']
+    
     proba = data['probability']
     feature_names = data['feature_names']
     shap_values = data['shap_values']
@@ -46,9 +108,10 @@ if col1.button('Run'):
     decision_message = "Le prêt sera accordé." if proba < 48 else "Le prêt ne sera pas accordé."
     st.markdown(f"<div style='text-align: center; color:{color}; font-size:30px; border:2px solid {color}; padding:10px;'>{decision_message}</div>", unsafe_allow_html=True)
 
-
-    # Top 10 des fonctionnalités augmentant la probabilité
+    # Ici, nous définissons top_positive_shap et top_negative_shap
     top_positive_shap = shap_df.sort_values(by='SHAP Value', ascending=False).head(10)
+    top_negative_shap = shap_df.sort_values(by='SHAP Value').head(10)
+
     fig_positive = go.Figure(data=[
         go.Bar(y=top_positive_shap['Feature'], x=top_positive_shap['SHAP Value'], orientation='h')
     ])
@@ -79,7 +142,6 @@ if col1.button('Run'):
     fig_positive.update_xaxes(title_text="Impact des fonctionnalités")  # Ajout de l'annotation à l'axe des x
 
     # Top 10 des fonctionnalités réduisant la probabilité
-    top_negative_shap = shap_df.sort_values(by='SHAP Value').head(10)
     fig_negative = go.Figure(data=[
         go.Bar(y=top_negative_shap['Feature'], x=top_negative_shap['SHAP Value'], orientation='h')
     ])
@@ -115,5 +177,27 @@ if col1.button('Run'):
     col_chart1, col_chart2 = st.columns(2)
     col_chart1.plotly_chart(fig_positive)
     col_chart2.plotly_chart(fig_negative)
+
+    # Créez des colonnes pour les listes déroulantes
+    col1, col2 = st.columns(2)  # Créer 2 colonnes
+
+    # Mettez la première liste déroulante dans col1
+    with col1:
+        selected_feature_positive = st.selectbox(
+            "Sélectionnez une fonctionnalité augmentant le risque", [""] + top_positive_shap["Feature"].tolist()
+        )
+
+    # Mettez la deuxième liste déroulante dans col2
+    with col2:
+        selected_feature_negative = st.selectbox(
+            "Sélectionnez une fonctionnalité réduisant le risque", [""] + top_negative_shap["Feature"].tolist()
+        )
+
+    # Ensuite, définissez les colonnes pour les tracés :
+    col_dist1, col_dist2 = st.columns(2)
+
+    # Et finalement, appelez vos fonctions `plot_distribution` :
+    plot_distribution(selected_feature_positive, col_dist1)
+    plot_distribution(selected_feature_negative, col_dist2)
 
 
