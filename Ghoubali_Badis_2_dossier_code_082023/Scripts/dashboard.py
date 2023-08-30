@@ -5,6 +5,8 @@ import requests
 import streamlit as st
 
 df_test = pd.read_csv("./Ghoubali_Badis_2_dossier_code_082023/Simulations/df_test.csv")
+definition_features_df = pd.read_csv("./Ghoubali_Badis_2_dossier_code_082023/Simulations/definition_features.csv")
+
 
 st.set_page_config(layout='wide') 
 
@@ -24,9 +26,11 @@ def format_value(val):
         return round(val, 2)
     return val
 
-# Fonction pour afficher le tracé de distribution :
-import numpy as np
-import plotly.graph_objects as go
+def find_closest_description(feature_name, definitions_df):
+    for index, row in definitions_df.iterrows():
+        if row['Row'] in feature_name:
+            return row['Description']
+    return None
 
 
 def plot_distribution(selected_feature, col):
@@ -52,9 +56,16 @@ def plot_distribution(selected_feature, col):
         # Tracer la distribution avec les couleurs personnalisées :
         fig.add_trace(go.Histogram(x=data, marker=dict(color=colors, opacity=0.7), name="Distribution", xbins=dict(start=bins[0], end=bins[-1], size=bins[1]-bins[0])))
         
-        fig.update_layout(title_text=f"Distribution pour {selected_feature}", xaxis_title=selected_feature, yaxis_title="Nombre de clients")
+        fig.update_layout(title_text=f"Distribution pour {selected_feature}", xaxis_title=selected_feature, yaxis_title="Nombre de clients", title_x=0.3)
         
         col.plotly_chart(fig)
+
+        # Afficher la définition de la feature choisi :
+        description = find_closest_description(selected_feature, definition_features_df)
+        if description:
+            col.write(f'**Definition:** {description}')
+
+
 
 
 # Une fonction pour récupérer les états stockés :
