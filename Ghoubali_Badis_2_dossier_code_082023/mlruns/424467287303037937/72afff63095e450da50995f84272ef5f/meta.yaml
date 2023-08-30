@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Utilisateur/Desktop/OpenClassrooms/Projets/Projet%207/Projet/Ghoubali_Badis_2_dossier_code_082023/mlruns/424467287303037937/72afff63095e450da50995f84272ef5f/artifacts
+end_time: 1693170605980
+entry_point_name: ''
+experiment_id: '424467287303037937'
+lifecycle_stage: active
+run_id: 72afff63095e450da50995f84272ef5f
+run_name: selective-koi-754
+run_uuid: 72afff63095e450da50995f84272ef5f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1693170601471
+status: 3
+tags: []
+user_id: Badis

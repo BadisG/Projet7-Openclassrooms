@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Utilisateur/Desktop/OpenClassrooms/Projets/Projet%207/Projet/Ghoubali_Badis_2_dossier_code_082023/mlruns/948990283897291215/6f226915087c4cf5afb4c42f1d78c237/artifacts
+end_time: 1693232866407
+entry_point_name: ''
+experiment_id: '948990283897291215'
+lifecycle_stage: active
+run_id: 6f226915087c4cf5afb4c42f1d78c237
+run_name: casual-stag-250
+run_uuid: 6f226915087c4cf5afb4c42f1d78c237
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1693232862879
+status: 3
+tags: []
+user_id: Badis

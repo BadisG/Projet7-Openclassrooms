@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Utilisateur/Desktop/OpenClassrooms/Projets/Projet%207/Projet/Ghoubali_Badis_2_dossier_code_082023/mlruns/948990283897291215/7cb5482f998b477c833661f004d098fc/artifacts
+end_time: 1693230963741
+entry_point_name: ''
+experiment_id: '948990283897291215'
+lifecycle_stage: active
+run_id: 7cb5482f998b477c833661f004d098fc
+run_name: resilient-ox-711
+run_uuid: 7cb5482f998b477c833661f004d098fc
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1693230960215
+status: 3
+tags: []
+user_id: Badis

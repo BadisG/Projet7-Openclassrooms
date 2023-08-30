@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Utilisateur/Desktop/OpenClassrooms/Projets/Projet%207/Projet/Ghoubali_Badis_2_dossier_code_082023/mlruns/948990283897291215/572e76905e954723b66187a632905322/artifacts
+end_time: 1693229774692
+entry_point_name: ''
+experiment_id: '948990283897291215'
+lifecycle_stage: active
+run_id: 572e76905e954723b66187a632905322
+run_name: colorful-cub-960
+run_uuid: 572e76905e954723b66187a632905322
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1693229771261
+status: 3
+tags: []
+user_id: Badis

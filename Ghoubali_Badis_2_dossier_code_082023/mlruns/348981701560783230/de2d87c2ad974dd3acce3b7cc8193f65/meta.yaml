@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Utilisateur/Desktop/OpenClassrooms/Projets/Projet 7/Projet/Ghoubali_Badis_2_dossier_code_082023/mlruns/348981701560783230/de2d87c2ad974dd3acce3b7cc8193f65/artifacts
+end_time: 1693275533037
+entry_point_name: ''
+experiment_id: '348981701560783230'
+lifecycle_stage: active
+run_id: de2d87c2ad974dd3acce3b7cc8193f65
+run_name: DummyClassifier
+run_uuid: de2d87c2ad974dd3acce3b7cc8193f65
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1693275529610
+status: 3
+tags: []
+user_id: Badis

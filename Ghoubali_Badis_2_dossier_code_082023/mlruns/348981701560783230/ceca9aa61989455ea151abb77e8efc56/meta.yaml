@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Utilisateur/Desktop/OpenClassrooms/Projets/Projet 7/Projet/Ghoubali_Badis_2_dossier_code_082023/mlruns/348981701560783230/ceca9aa61989455ea151abb77e8efc56/artifacts
+end_time: 1693275727613
+entry_point_name: ''
+experiment_id: '348981701560783230'
+lifecycle_stage: active
+run_id: ceca9aa61989455ea151abb77e8efc56
+run_name: Logistic_Regression
+run_uuid: ceca9aa61989455ea151abb77e8efc56
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1693275724066
+status: 3
+tags: []
+user_id: Badis

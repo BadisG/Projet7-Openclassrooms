@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Utilisateur/Desktop/OpenClassrooms/Projets/Projet%207/Projet/Ghoubali_Badis_2_dossier_code_082023/mlruns/424467287303037937/9131cf4c40494787bf206e4813cb3adb/artifacts
+end_time: 1693183601178
+entry_point_name: ''
+experiment_id: '424467287303037937'
+lifecycle_stage: active
+run_id: 9131cf4c40494787bf206e4813cb3adb
+run_name: beautiful-snake-375
+run_uuid: 9131cf4c40494787bf206e4813cb3adb
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1693183597709
+status: 3
+tags: []
+user_id: Badis

@@ -1,0 +1,15 @@
+artifact_uri: file:///C:/Users/Utilisateur/Desktop/OpenClassrooms/Projets/Projet%207/Projet/Ghoubali_Badis_2_dossier_code_082023/mlruns/772370665145895406/f5ca9ce11e8743a4bb202030d9f8fc1e/artifacts
+end_time: 1693167224147
+entry_point_name: ''
+experiment_id: '772370665145895406'
+lifecycle_stage: active
+run_id: f5ca9ce11e8743a4bb202030d9f8fc1e
+run_name: loud-snipe-402
+run_uuid: f5ca9ce11e8743a4bb202030d9f8fc1e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1693167216916
+status: 3
+tags: []
+user_id: Badis
