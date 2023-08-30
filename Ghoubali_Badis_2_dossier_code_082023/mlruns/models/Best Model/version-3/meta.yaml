@@ -1,0 +1,13 @@
+aliases: []
+creation_timestamp: 1693364179928
+current_stage: None
+description: ''
+last_updated_timestamp: 1693364179928
+name: Best Model
+run_id: b88006f67ecb4c278d0c9e1aea25e86a
+run_link: ''
+source: file:///C:/Users/Utilisateur/Desktop/OpenClassrooms/Projets/Projet 7/Projet/Ghoubali_Badis_2_dossier_code_082023/mlruns/348981701560783230/b88006f67ecb4c278d0c9e1aea25e86a/artifacts/model
+status: READY
+status_message: null
+user_id: null
+version: 3
