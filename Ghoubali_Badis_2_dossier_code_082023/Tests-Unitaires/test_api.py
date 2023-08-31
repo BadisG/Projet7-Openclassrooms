@@ -1,48 +1,58 @@
+import os
+import sys
+import joblib
+import pandas as pd
 import pytest
-from unittest.mock import patch, Mock
+from flask import Flask, jsonify, request
 
-# Cas de test pour le chargement du modèle
+# Ajouter le chemin relatif du fichier api.py au sys.path pour pouvoir l'importer
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'Scripts')))
+
+# Importer les éléments nécessaires du fichier api.py
+from api import app, current_directory, model, predict
+
+# Créer un client de test pour l'application Flask
+@pytest.fixture
+def client():
+    app.config['TESTING'] = True
+    with app.test_client() as client:
+        yield client
+
+# Teste le chargement du modèle de prédiction
 def test_model_loading():
-    import joblib
-    import os
-    # Détermine le chemin du répertoire courant
-    current_directory = os.path.dirname(os.path.abspath(__file__))
-    # Détermine le chemin du modèle
+    # Détermine le chemin du fichier contenant le modèle entraîné
     model_path = os.path.join(current_directory, "..", "Simulations", "Best_model", "model.pkl")
-    # Charge le modèle
+    # Charge le modèle à partir du fichier
     model = joblib.load(model_path)
-    # Assure que le modèle est bien chargé
-    assert model is not None, "Le modèle n'a pas été correctement chargé."
+    # Vérifie que le modèle a été chargé correctement
+    assert model is not None, "Erreur dans le chargement du modèle."
 
-# Cas de test pour le chargement du CSV
+# Teste le chargement du fichier CSV contenant les données de test
 def test_csv_loading():
-    import pandas as pd
-    import os
-    # Détermine le chemin du répertoire courant
-    current_directory = os.path.dirname(os.path.abspath(__file__))
     # Détermine le chemin du fichier CSV
     csv_path = os.path.join(current_directory, "..", "Simulations", "df_test.csv")
-    # Charge le CSV dans un DataFrame
+    # Charge le fichier CSV dans un DataFrame pandas
     df = pd.read_csv(csv_path)
-    # Assure que le DataFrame n'est pas vide
-    assert not df.empty, "Le DataFrame est vide, le CSV n'a pas été chargé correctement."
+    # Vérifie que le DataFrame n'est pas vide
+    assert not df.empty, "Erreur dans le chargement du CSV."
 
-# Cas de test pour la prédiction
+# Teste la fonction de prédiction de l'API
 def test_prediction():
-    import joblib
     import os
     import pandas as pd
+    from flask import json
     # Détermine le chemin du répertoire courant
     current_directory = os.path.dirname(os.path.abspath(__file__))
-    # Détermine le chemin du modèle et du fichier CSV
-    model_path = os.path.join(current_directory, "..", "Simulations", "Best_model", "model.pkl")
+    # Détermine le chemin du fichier CSV contenant les données de test
     csv_path = os.path.join(current_directory, "..", "Simulations", "df_test.csv")
-    # Charge le modèle et le fichier CSV
-    model = joblib.load(model_path)
+    # Charge le fichier CSV dans un DataFrame pandas
     df = pd.read_csv(csv_path)
     # Prend un échantillon pour la prédiction
-    sample = df.iloc[0].drop(labels=["SK_ID_CURR"])
-    prediction = model.predict_proba([sample])
-    # Assure que la prédiction est effectuée
-    assert prediction is not None, "La prédiction a échoué."
-
+    sk_id_curr = df.iloc[0]['SK_ID_CURR']
+    # Crée une requête de test pour la prédiction en utilisant l'échantillon sélectionné
+    with app.test_client() as client:
+        response = client.post('/predict', json={'SK_ID_CURR': sk_id_curr})
+        data = json.loads(response.data)
+        prediction = data['probability']
+        # Vérifie que la prédiction a été effectuée correctement
+        assert prediction is not None, "La prédiction a échoué."
