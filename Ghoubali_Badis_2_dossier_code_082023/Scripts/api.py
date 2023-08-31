@@ -7,13 +7,10 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
+model = None  # Initialisation à None
+
 # Récupérez le répertoire actuel du fichier api.py
 current_directory = os.path.dirname(os.path.abspath(__file__))
-
-# Construisez le chemin complet vers model.pkl en utilisant le chemin relatif depuis l'emplacement de api.py
-model_path = os.path.join(current_directory, "..", "Simulations", "Best_model", "model.pkl")
-# Chargement du modèle
-model = joblib.load(model_path)
 
 @app.route("/predict", methods=['POST'])
 def predict():
@@ -45,5 +42,8 @@ def predict():
         'feature_values': sample.values[0].tolist()
     })
 
+# Déplacer la logique de chargement du modèle à l'intérieur de la clause if __name__ == "__main__":
 if __name__ == "__main__":
+    model_path = os.path.join(current_directory, "..", "Simulations", "Best_model", "model.pkl")
+    model = joblib.load(model_path)
     app.run(debug=True)

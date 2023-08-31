@@ -12,3 +12,7 @@ Implémentez_un_modèle_de_scoring_Ghoubali_Badis.zip
 Tuto-git.txt
 input/
 Ghoubali_Badis_2_dossier_code_082023/Scripts/Refractor(lent)/
+Ghoubali_Badis_2_dossier_code_082023/Tests-Unitaires/EXECUTE_TEST_api.cmd
+Ghoubali_Badis_2_dossier_code_082023/Tests-Unitaires/EXECUTE_TEST_dashboard.cmd
+Ghoubali_Badis_2_dossier_code_082023/Tests-Unitaires/__pycache__/test_api.cpython-310-pytest-7.2.1.pyc
+Ghoubali_Badis_2_dossier_code_082023/Tests-Unitaires/__pycache__/test_dashboard.cpython-310-pytest-7.2.1.pyc

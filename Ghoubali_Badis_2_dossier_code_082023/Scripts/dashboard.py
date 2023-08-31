@@ -3,12 +3,17 @@ import pandas as pd
 import plotly.graph_objects as go
 import requests
 import streamlit as st
+import os
 
-df_test = pd.read_csv("./Ghoubali_Badis_2_dossier_code_082023/Simulations/df_test.csv")
-definition_features_df = pd.read_csv(
-    "./Ghoubali_Badis_2_dossier_code_082023/Simulations/definition_features.csv"
-)
+# Obtenez le répertoire courant du script
+current_directory = os.path.dirname(os.path.abspath(__file__))
 
+# Construisez le chemin approprié pour vos fichiers CSV
+path_df_test = os.path.join(current_directory, "../Simulations/df_test.csv")
+path_definition_features_df = os.path.join(current_directory, "../Simulations/definition_features.csv")
+
+df_test = pd.read_csv(path_df_test)
+definition_features_df = pd.read_csv(path_definition_features_df)
 
 st.set_page_config(layout="wide")
 
