@@ -9,10 +9,10 @@ import os
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
 # Construisez le chemin approprié pour vos fichiers CSV
-path_df_test = os.path.join(current_directory, "../Simulations/df_test.csv")
+path_df_train = os.path.join(current_directory, "../Simulations/df_train.csv")
 path_definition_features_df = os.path.join(current_directory, "../Simulations/definition_features.csv")
 
-df_test = pd.read_csv(path_df_test)
+df_train = pd.read_csv(path_df_train)
 definition_features_df = pd.read_csv(path_definition_features_df)
 
 st.set_page_config(layout="wide")
@@ -44,7 +44,7 @@ def find_closest_description(feature_name, definitions_df):
 
 def plot_distribution(selected_feature, col):
     if selected_feature:
-        data = df_test[selected_feature]
+        data = df_train[selected_feature]
 
         # Trouver la valeur de la fonctionnalité pour le client actuel :
         client_feature_value = feature_values[feature_names.index(selected_feature)]
@@ -147,7 +147,7 @@ st.markdown(
     "<h1 style='text-align: center; color: black;'>Estimation du risque de non-remboursement</h1>",
     unsafe_allow_html=True,
 )
-sk_id_curr = st.text_input("Entrez le SK_ID_CURR: (373022 = Refusé | 156925 = Accepté)")
+sk_id_curr = st.text_input("Entrez le SK_ID_CURR:")
 col1, col2 = st.columns([1, 20])
 
 if col1.button("Run") or state["data_received"]:
