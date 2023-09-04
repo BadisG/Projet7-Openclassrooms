@@ -1,2 +1,2 @@
 pytest==7.2.1
-joblib==4.17.3
+joblib==1.2.0
