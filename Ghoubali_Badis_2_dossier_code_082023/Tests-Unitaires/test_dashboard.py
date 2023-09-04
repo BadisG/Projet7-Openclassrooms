@@ -3,14 +3,14 @@ from unittest.mock import patch, Mock
 import os
 import sys
 
-# Obtenez le répertoire de travail actuel
-cwd = os.getcwd()
+# Obtenir le répertoire du fichier actuel 
+current_file_directory = os.path.dirname(__file__)
 
-# Créez un chemin relatif vers le dossier contenant dashboard.py
-scripts_dir = os.path.join(cwd, "..", "Scripts")
+# Créer un chemin relatif vers le dossier 'Scripts'
+scripts_directory = os.path.abspath(os.path.join(current_file_directory, '..', 'Scripts'))
 
-# Ajoutez ce chemin au sys.path pour pouvoir importer des modules à partir de ce dossier
-sys.path.append(scripts_dir)
+# Insérer ce chemin au début de sys.path
+sys.path.insert(0, scripts_directory)
 
 # Simulation d'un état pour st.session_state
 mocked_session_state = {'state': {'data_received': False, 'data': None, 'last_sk_id_curr': None}}
