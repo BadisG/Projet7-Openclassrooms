@@ -29,6 +29,12 @@ jobs:
       
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      - name: Run Test unitaire API
+        run: pytest ./Ghoubali_Badis_2_dossier_code_082023/Tests-Unitaires/test_api.py
+
+      - name: Run Test unitaire Dashboard
+        run: pytest ./Ghoubali_Badis_2_dossier_code_082023/Tests-Unitaires/test_dashboard.py
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
       
