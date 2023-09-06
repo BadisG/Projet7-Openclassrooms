@@ -1,21 +1,74 @@
+import os
+
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import requests
 import streamlit as st
-import os
 
 # Obtenez le répertoire courant du script
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
 # Construisez le chemin approprié pour vos fichiers CSV
 path_df_train = os.path.join(current_directory, "../Simulations/df_train.csv")
-path_definition_features_df = os.path.join(current_directory, "../Simulations/definition_features.csv")
+path_definition_features_df = os.path.join(
+    current_directory, "../Simulations/definition_features.csv"
+)
 
 df_train = pd.read_csv(path_df_train)
 definition_features_df = pd.read_csv(path_definition_features_df)
 
 st.set_page_config(layout="wide")
+
+
+def get_title_font_size(height):
+    base_size = 12  # une taille de police de base
+    scale_factor = height / 600.0  # supposons que 600 est la hauteur par défaut
+    return base_size * scale_factor
+
+
+def generate_figure(df, title_text, x_anchor, yaxis_categoryorder, yaxis_side):
+    fig = go.Figure(data=[go.Bar(y=df["Feature"], x=df["SHAP Value"], orientation="h")])
+    annotations = generate_annotations(df, x_anchor)
+
+    title_font_size = get_title_font_size(600)
+    fig.update_layout(
+        annotations=annotations,
+        title_text=title_text,
+        title_x=0.25,
+        title_y=0.88,
+        title_font=dict(size=title_font_size),
+        yaxis=dict(
+            categoryorder=yaxis_categoryorder, side=yaxis_side, tickfont=dict(size=14)
+        ),
+        height=600,
+    )
+    fig.update_xaxes(title_text="Impact des fonctionnalités")
+    return fig
+
+
+def generate_annotations(df, x_anchor):
+    annotations = []
+    for y_val, x_val, feat_val in zip(
+        df["Feature"], df["SHAP Value"], df["Feature Value"]
+    ):
+        formatted_feat_val = (
+            feat_val
+            if pd.isna(feat_val)
+            else (int(feat_val) if feat_val == int(feat_val) else feat_val)
+        )
+        annotations.append(
+            dict(
+                x=x_val,
+                y=y_val,
+                text=f"<b>{formatted_feat_val}</b>",
+                showarrow=False,
+                xanchor=x_anchor,
+                yanchor="middle",
+                font=dict(color="white"),
+            )
+        )
+    return annotations
 
 
 def compute_color(value):
@@ -107,14 +160,18 @@ def plot_distribution(selected_feature, col):
             if std_val > 3 * mean_val:  # Ce seuil peut être ajusté selon vos besoins
                 fig.update_layout(yaxis_type="log")
 
+        height = 600  # Ajustez cette valeur selon la hauteur par défaut de votre figure ou obtenez-la d'une autre manière.
+        title_font_size = get_title_font_size(height)
+
         fig.update_layout(
             title_text=f"Distribution pour {selected_feature}",
+            title_font=dict(size=title_font_size),  # Ajoutez cette ligne
             xaxis_title=selected_feature,
             yaxis_title="Nombre de clients",
             title_x=0.3,
         )
 
-        col.plotly_chart(fig)
+        col.plotly_chart(fig, use_container_width=True)
 
         # Afficher la définition de la feature choisi :
         description = find_closest_description(selected_feature, definition_features_df)
@@ -147,8 +204,23 @@ st.markdown(
     "<h1 style='text-align: center; color: black;'>Estimation du risque de non-remboursement</h1>",
     unsafe_allow_html=True,
 )
-sk_id_curr = st.text_input("Entrez le SK_ID_CURR:")
+sk_id_curr = st.text_input(
+    "Entrez le SK_ID_CURR:", on_change=lambda: state.update(run=True)
+)
 col1, col2 = st.columns([1, 20])
+
+st.markdown(
+    """
+    <style>
+        /* Style pour le bouton */
+        button {
+            width: 60px !important;
+            white-space: nowrap !important;
+        }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 if col1.button("Run") or state["data_received"]:
     # Avant de traiter l'appel API, vérifiez si l'ID actuel est différent du dernier ID
@@ -186,8 +258,9 @@ if col1.button("Run") or state["data_received"]:
     )
 
     color = compute_color(proba)
+    st.empty()
     col2.markdown(
-        f"La probabilité que ce client ne puisse pas rembourser son crédit est de <span style='color:{color}; font-weight:bold;'>{proba:.2f}%</span> (tolérance max: <strong>48%</strong>)",
+        f"<p style='margin: 10px;'>La probabilité que ce client ne puisse pas rembourser son crédit est de <span style='color:{color}; font-weight:bold;'>{proba:.2f}%</span> (tolérance max: <strong>48%</strong>)</p>",
         unsafe_allow_html=True,
     )
 
@@ -203,117 +276,28 @@ if col1.button("Run") or state["data_received"]:
     top_positive_shap = shap_df.sort_values(by="SHAP Value", ascending=False).head(10)
     top_negative_shap = shap_df.sort_values(by="SHAP Value").head(10)
 
-    fig_positive = go.Figure(
-        data=[
-            go.Bar(
-                y=top_positive_shap["Feature"],
-                x=top_positive_shap["SHAP Value"],
-                orientation="h",
-            )
-        ]
+    fig_positive = generate_figure(
+        top_positive_shap,
+        "Top 10 des fonctionnalités augmentant le risque de non-remboursement",
+        "right",
+        "total ascending",
+        "left",
     )
-
-    annotations = []
-    for y_val, x_val, feat_val in zip(
-        top_positive_shap["Feature"],
-        top_positive_shap["SHAP Value"],
-        top_positive_shap["Feature Value"],
-    ):
-        if pd.isna(feat_val):
-            formatted_feat_val = feat_val
-        else:
-            formatted_feat_val = (
-                int(feat_val) if feat_val == int(feat_val) else feat_val
-            )
-        annotations.append(
-            dict(
-                x=x_val,
-                y=y_val,
-                text=f"<b>{formatted_feat_val}</b>",
-                showarrow=False,
-                xanchor="right",
-                yanchor="middle",
-                font=dict(color="white"),
-            )
-        )
-
-    fig_positive.update_layout(annotations=annotations)
-
-    fig_positive.update_layout(
-        title_text="Top 10 des fonctionnalités augmentant le risque de non-remboursement",
-        title_x=0.25,
-        title_y=0.88,
-        title_font=dict(size=16),  # Réduire la taille de la police du titre
-        yaxis=dict(
-            categoryorder="total ascending",
-            tickfont=dict(
-                size=14
-            ),  # Augmenter la taille de la police pour les annotations
-        ),
-        height=600,
+    fig_negative = generate_figure(
+        top_negative_shap,
+        "Top 10 des fonctionnalités réduisant le risque de non-remboursement",
+        "left",
+        "total descending",
+        "right",
     )
-    fig_positive.update_xaxes(
-        title_text="Impact des fonctionnalités"
-    )  # Ajout de l'annotation à l'axe des x
-
-    # Top 10 des fonctionnalités réduisant la probabilité
-    fig_negative = go.Figure(
-        data=[
-            go.Bar(
-                y=top_negative_shap["Feature"],
-                x=top_negative_shap["SHAP Value"],
-                orientation="h",
-            )
-        ]
-    )
-
-    # Générer des annotations pour top_negative_shap
-    annotations_negative = []
-    for y_val, x_val, feat_val in zip(
-        top_negative_shap["Feature"],
-        top_negative_shap["SHAP Value"],
-        top_negative_shap["Feature Value"],
-    ):
-        if pd.isna(feat_val):
-            formatted_feat_val = feat_val
-        else:
-            formatted_feat_val = (
-                int(feat_val) if feat_val == int(feat_val) else feat_val
-            )
-        annotations_negative.append(
-            dict(
-                x=x_val,
-                y=y_val,
-                text=f"<b>{formatted_feat_val}</b>",
-                showarrow=False,
-                xanchor="left",
-                yanchor="middle",
-                font=dict(color="white"),
-            )
-        )
-
-    # Mettre à jour le graphique fig_negative pour inclure ces annotations
-    fig_negative.update_layout(annotations=annotations_negative)
-
-    fig_negative.update_layout(
-        title_text="Top 10 des fonctionnalités réduisant le risque de non-remboursement",
-        title_x=0.25,
-        title_y=0.88,
-        title_font=dict(size=16),
-        yaxis=dict(
-            categoryorder="total descending", side="right", tickfont=dict(size=14)
-        ),
-        height=600,
-    )
-    fig_negative.update_xaxes(title_text="Impact des fonctionnalités")
 
     # Créer une nouvelle ligne pour les graphiques
     col_chart1, col_chart2 = st.columns(2)
-    col_chart1.plotly_chart(fig_positive)
-    col_chart2.plotly_chart(fig_negative)
+    col_chart1.plotly_chart(fig_positive, use_container_width=True)
+    col_chart2.plotly_chart(fig_negative, use_container_width=True)
 
     # Créez des colonnes pour les listes déroulantes
-    col1, col2 = st.columns(2)  # Créer 2 colonnes
+    col1, col2 = st.columns(2)
 
     # Mettez la première liste déroulante dans col1
     with col1:
@@ -329,9 +313,6 @@ if col1.button("Run") or state["data_received"]:
             [""] + top_negative_shap["Feature"].tolist(),
         )
 
-    # Ensuite, définissez les colonnes pour les tracés :
-    col_dist1, col_dist2 = st.columns(2)
-
     # Et finalement, appelez vos fonctions `plot_distribution` :
-    plot_distribution(selected_feature_positive, col_dist1)
-    plot_distribution(selected_feature_negative, col_dist2)
+    plot_distribution(selected_feature_positive, col1)
+    plot_distribution(selected_feature_negative, col2)

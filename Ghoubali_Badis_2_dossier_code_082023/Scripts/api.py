@@ -13,6 +13,10 @@ current_directory = os.path.dirname(os.path.abspath(__file__))
 model_path = os.path.join(current_directory, "..", "Simulations", "Best_model", "model.pkl")
 model = joblib.load(model_path)
 
+# Charger le scaler
+scaler_path = os.path.join(current_directory, "..", "Simulations", "Scaler", "StandardScaler.pkl")
+scaler = joblib.load(scaler_path)
+
 @app.route("/predict", methods=['POST'])
 def predict():
     data = request.json
@@ -27,13 +31,16 @@ def predict():
     # Supprimer la colonne ID pour la prédiction
     sample = sample.drop(columns=['SK_ID_CURR'])
 
+    # Appliquer le scaler
+    sample_scaled = scaler.transform(sample)
+
     # Prédire
-    prediction = model.predict_proba(sample)
+    prediction = model.predict_proba(sample_scaled)
     proba = prediction[0][1] # Probabilité de la seconde classe
 
     # Calculer les valeurs SHAP pour l'échantillon donné
     explainer = shap.TreeExplainer(model)
-    shap_values = explainer.shap_values(sample)
+    shap_values = explainer.shap_values(sample_scaled)
     
     # Retourner les valeurs SHAP avec la probabilité
     return jsonify({
