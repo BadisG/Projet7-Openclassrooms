@@ -27,7 +27,7 @@ def test_model_loading():
     # Vérifie que le modèle a été chargé correctement
     assert model is not None, "Erreur dans le chargement du modèle."
 
-# Teste le chargement du fichier CSV contenant les données de test
+# Teste le chargement du fichier CSV contenant les données de train
 def test_csv_loading():
     # Détermine le chemin du fichier CSV
     csv_path = os.path.join(current_directory, "..", "Simulations", "df_train.csv")
