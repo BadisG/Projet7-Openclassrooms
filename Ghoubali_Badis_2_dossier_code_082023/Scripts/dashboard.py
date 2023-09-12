@@ -10,9 +10,9 @@ import streamlit as st
 current_directory = os.path.dirname(os.path.abspath(__file__))
 
 # Construisez le chemin approprié pour vos fichiers CSV
-path_df_train = os.path.join(current_directory, "../Simulations/df_train.csv")
+path_df_train = os.path.join(current_directory, "../Simulations/Data/df_train.csv")
 path_definition_features_df = os.path.join(
-    current_directory, "../Simulations/definition_features.csv"
+    current_directory, "../Simulations/Data/definition_features.csv"
 )
 
 df_train = pd.read_csv(path_df_train)
